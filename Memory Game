@@ -1,5 +1,5 @@
 package all;
-//MEMORY GAME
+//MEMORY GAME  JAVA
 //This program will run a memory game which creates 3 random numbers to be replaced into a string array "- - - -" like this.
 //The user will then be asked to remember the numbers and input them into JOptionPane for each line.
 //The program checks if the user is correct for each line and if they remember they move on to the second round.
