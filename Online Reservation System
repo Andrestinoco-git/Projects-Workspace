@@ -1,0 +1,216 @@
+/*Andres Tinoco               *Thursday March 28,2018
+ONLINE RESERVATION SYSTEM
+
+ * This is a program that asks the user to reserve seats on an airplane. The seats in first class are 1-5 and economy is from 6-10.
+ * The user is asked to choose between first class and economy seating and assigns seating starting from 1-5 in first class, and 6-10
+ * in economy. The user is also asked to choose if they want to continue to reserve more seating until all seats are reserved. 
+*/
+package activities;
+
+//import java.util.Scanner to enable keyboard input
+import java.util.Scanner;
+
+public class CodingAssignment2
+{
+
+	public static void main(String[] args)
+	{
+		//create keyboard Scanner to read keyboard input from user
+		Scanner keyboard = new Scanner(System.in);
+		
+		//create boolean array for firstClass seating to store 5 boolean variables to show whether a seat was reserved.(false = not reserved, true = reserved)
+		boolean[] firstClass= {false,false,false,false,false};
+		
+		//create boolean array for economy seating to store 5 boolean variables to show whether a seat was reserved.(false = not reserved, true = reserved)
+		boolean[] economy= {false,false,false,false,false};
+		
+		//welcome user to the program
+		System.out.println("Welcome to the online reservation system.");
+		//print line for formatting
+		System.out.println();
+		
+		//create String variable answer to store "y"
+		String answer = "y";
+		//create integer variable seatNumber for first class seating. Used to initialize firstClass array seats with true (meaning reserved).
+		int seatNumber=0;
+		//create integer variable seatNumberE for economy seating. Used to initialize economy array seats with true (meaning reserved).
+		int seatNumberE=0;
+		//create integer variable seatDisplay to display to user which seat they had just reserved in first class as to not affect the seatNumber variable in which seat is set to true.
+		int seatDisplay=1;
+		//create integer variable seatDisplayE to display to user which seat they had just reserved in economy as to not affect the seatNumberE variable in which seat is set to true.
+		int seatDisplayE=6;
+		//integer variable choice to store which type of seating the user would like (1 for first class and 2 for economy).
+		int choice = 0;
+		//create integer variable check so when seats are full in either first class or economy, when the user is asked for seating in the other class, the user is not asked twice
+		int check=0;
+		//create String variable moreSeats to store the answer whether the user would want more seats in the economy or first class depending on which one is full(y-Yes or n-No)
+		String moreSeats;
+		String fakeChoice=".";
+		int checkFake=0;
+		int checkFakeE=0;
+		int fakeTypeChoice=0;
+		
+		
+		//While loop begins with answer variable set to "y" so the user is consistently asked if they would like more seating
+		while (answer.endsWith("y"))
+		{
+			if (seatNumber!=100&&seatNumberE!=100) 
+			{
+				System.out.print("Please type 1 for First Class or type 2 for Economy: ");
+				choice = keyboard.nextInt();
+				while (choice!=1&&choice!=2)
+				{
+					System.out.print("That is not a valid input. Please choose 1 for first class or 2 for economy: ");
+					choice = keyboard.nextInt();
+				}
+			}
+			
+			////////////////
+			//FIRSTCLASS//
+			////////////////
+			if (choice==1)
+			{
+				
+				if (seatNumber>4)
+				{
+					System.out.print("First class is full. Would you like a seat in economy (y-Yes or n-No): ");
+					moreSeats=keyboard.next();
+					while (!moreSeats.endsWith("y")&&!moreSeats.endsWith("n"))
+					{
+						System.out.print("That is not a valid option, enter (y-Yes or n-No): ");
+						answer=keyboard.next();
+						answer=answer.toLowerCase();
+					}
+					if (moreSeats.endsWith("y")) 
+					{
+						seatNumber=100;
+						choice=2;
+						check=1;
+						checkFake=1;
+					}
+					else 
+					{
+						break;
+					}
+					
+				}
+				
+				else 
+				{
+					firstClass[seatNumber]=true;
+				}
+				if (seatNumber<=4) 
+				{
+					System.out.println("You have seat "+(seatDisplay++)+" reserved in first class.");
+					seatNumber++;
+				}
+				
+			}
+			//////////////
+			//ECONOMY//
+			/////////////
+			else 
+			{
+				if (seatNumberE>4)
+				{
+					System.out.print("Economy is full. Would you like a seat in first class (y-Yes or n-No): ");
+					moreSeats=keyboard.next();
+					while (!moreSeats.endsWith("y")&&!moreSeats.endsWith("n"))
+					{
+						System.out.print("That is not a valid option, enter (y-Yes or n-No): ");
+						answer=keyboard.next();
+						answer=answer.toLowerCase();
+					}
+					if (moreSeats.endsWith("y"))
+					{
+						seatNumberE=100;
+						choice=1;
+						check=1;
+						checkFakeE=1;
+					}
+					else 
+					{
+						break;
+					}
+					
+				}
+				
+				else 
+				{
+					economy[seatNumberE]=true;
+				}
+				if (seatNumberE<=4) {
+					System.out.println("You have seat "+(seatDisplayE++)+" reserved in economy.");
+					seatNumberE++;
+				}
+			}
+			
+			
+			//FLIGHT FULL//
+			if (seatNumber==100&&seatNumberE==100) 
+			{
+				System.out.println("The flight is full. Thank you for using the online reservation system.");
+				break;
+			}
+			
+			
+			if (seatNumber!=100||seatNumberE!=100) 
+			{
+				if(economy[4]==false||firstClass[4]==false) 
+				{
+					if (check==0) 
+					{
+						System.out.println();
+						System.out.print("Would you like to reserve another seat (y-Yes or n-No): ");
+						answer=keyboard.next();
+						answer=answer.toLowerCase();
+						while (!answer.endsWith("y")&&!answer.endsWith("n"))
+						{
+							System.out.print("That is not a valid option, enter (y-Yes or n-No): ");
+							answer=keyboard.next();
+							answer=answer.toLowerCase();
+						}
+						if (checkFake==1)
+						{
+							System.out.print("Please type 1 for First Class or type 2 for Economy: ");
+							fakeTypeChoice=keyboard.nextInt();
+							if (fakeTypeChoice!=2)
+							{
+								System.out.print("First class is full. Would you like a seat in economy (y-Yes or n-No): ");
+								fakeChoice=keyboard.next();
+							}
+							
+						}
+						if (checkFakeE==1)
+						{
+							System.out.print("Please type 1 for First Class or type 2 for Economy: ");
+							fakeTypeChoice=keyboard.nextInt();
+							if (fakeTypeChoice!=1)
+							{
+								System.out.print("Economy is full. Would you like a seat in first class (y-Yes or n-No): ");
+								fakeChoice=keyboard.next();
+							}
+							
+						}
+						if (checkFakeE==1&&checkFake==1)
+						{
+							System.out.println("The flight is full. Thank you for using the online reservation system.");
+							break;
+						}
+					}
+				}
+				check=0;
+			}
+		}
+		if (seatNumber!=100&&seatNumber!=100)
+		{
+			if (checkFakeE!=1||checkFake!=1)
+			{
+				System.out.println();
+				System.out.println("Thank you for using the online reservation system. Have a nice day.");
+			}
+			
+		}
+		
+	}
+}
