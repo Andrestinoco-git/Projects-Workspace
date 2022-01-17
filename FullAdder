@@ -1,0 +1,105 @@
+module LAB(input addsub,ci, input [3:0] a0, input [3:0] a1,output wire cOut, output wire[3:0] r, output [6:0] segr, output [6:0] co, output [6:0] seg0, output [6:0] seg1);
+
+module FULLADDERFINAL(A0,A1,Ci,R,COut);
+	input A0,A1;
+	input Ci;
+	output COut;
+	output R;
+	assign {COut, R} = A0 + A1 + Ci; 
+	
+//	input A0, A1, Ci;
+//    output R, COut;
+//
+//    //Sum
+//    assign R = A0 ^ A1 ^ Ci;
+//
+//    //Carry out
+//    assign COut = (A0 & A1) | (Ci & A0) | (Ci & A1);
+	 
+	endmodule
+module LAB3OFFICIAL(a0,a1,ci,r,segr,seg0,seg1);
+
+
+	//full adder
+	input [3:0] a0,a1;
+	input ci;
+	wire [2:0] cOut;
+	output [4:0] r;
+	output [6:0] segr,seg0,seg1;
+	
+	FULLADDERFINAL FA(a0[3],a1[3],ci,r[3],cOut[0]);
+	FULLADDERFINAL FA1(a0[2],a1[2],cOut[0],r[2],cOut[1]);
+	FULLADDERFINAL FA2(a0[1],a1[1],cOut[1],r[1],cOut[2]);
+	FULLADDERFINAL FA3(a0[0],a1[0],cOut[2],r[0],r[4]);
+	
+	//7 segment for a0
+	assign seg0[1] = a0[0]*a0[2]*a0[3] + a0[1]*a0[2]*~a0[3] + a0[1]*~a0[2]*(a0[0]^a0[3]);
+	
+	assign seg0[0] = a0[0]*a0[1]*~a0[2]*a0[3] + a0[0]*~a0[1]*a0[2]*a0[3] + ~a0[0]*a0[1]*~a0[2]*~a0[3] + ~a0[0]*~a0[1]*~a0[2]*a0[3];
+	
+	assign seg0[5] = a0[0]*a0[1]*~a0[2]*a0[3] + ~a0[0]*~a0[1]*a0[2] + ~a0[0]*~a0[1]*a0[3] + ~a0[0]*a0[2]*a0[3];
+	
+	assign seg0[6] = a0[0]*a0[1]*~a0[2]*~a0[3] + ~a0[0]*a0[1]*a0[2]*a0[3] + ~a0[0]*~a0[1]*~a0[2];
+	
+	assign seg0[4] = ~a0[1]*~a0[2]*a0[3] + ~a0[0]*a0[1]*~a0[2] + ~a0[0]*a0[2]*a0[3];
+	
+	assign seg0[3] = a0[0]*~a0[1]*a0[2]*~a0[3] + ~a0[0]*a0[1]*~a0[2]*~a0[3] + ~a0[0]*~a0[1]*~a0[2]*a0[3] + a0[1]*a0[2]*a0[3];
+	
+	assign seg0[2] = ~a0[0]*~a0[1]*a0[2]*~a0[3] + a0[0]*a0[1]*~a0[2]*~a0[3] + a0[0]*a0[1]*a0[2];
+	
+	//7 segment for a1
+	assign seg1[1] = a1[0]*a1[2]*a1[3] + a1[1]*a1[2]*~a1[3] + a1[1]*~a1[2]*(a1[0]^a1[3]);
+	
+	assign seg1[0] = a1[0]*a1[1]*~a1[2]*a1[3] + a1[0]*~a1[1]*a1[2]*a1[3] + ~a1[0]*a1[1]*~a1[2]*~a1[3] + ~a1[0]*~a1[1]*~a1[2]*a1[3];
+	
+	assign seg1[5] = a1[0]*a1[1]*~a1[2]*a1[3] + ~a1[0]*~a1[1]*a1[2] + ~a1[0]*~a1[1]*a1[3] + ~a1[0]*a1[2]*a1[3];
+	
+	assign seg1[6] = a1[0]*a1[1]*~a1[2]*~a1[3] + ~a1[0]*a1[1]*a1[2]*a1[3] + ~a1[0]*~a1[1]*~a1[2];
+	
+	assign seg1[4] = ~a1[1]*~a1[2]*a1[3] + ~a1[0]*a1[1]*~a1[2] + ~a1[0]*a1[2]*a1[3];
+	
+	assign seg1[3] = a1[0]*~a1[1]*a1[2]*~a1[3] + ~a1[0]*a1[1]*~a1[2]*~a1[3] + ~a1[0]*~a1[1]*~a1[2]*a1[3] + a1[1]*a1[2]*a1[3];
+	
+	assign seg1[2] = ~a1[0]*~a1[1]*a1[2]*~a1[3] + a1[0]*a1[1]*~a1[2]*~a1[3] + a1[0]*a1[1]*a1[2];
+	
+	//7 segment for r
+	assign segr[1] = r[0]*r[2]*r[3] + r[1]*r[2]*~r[3] + r[1]*~r[2]*(r[0]^r[3]);
+	
+	assign segr[0] = r[0]*r[1]*~r[2]*r[3] + r[0]*~r[1]*r[2]*r[3] + ~r[0]*r[1]*~r[2]*~r[3] + ~r[0]*~r[1]*~r[2]*r[3];
+	
+	assign segr[5] = r[0]*r[1]*~r[2]*r[3] + ~r[0]*~r[1]*r[2] + ~r[0]*~r[1]*r[3] + ~r[0]*r[2]*r[3];
+	
+	assign segr[6] = r[0]*r[1]*~r[2]*~r[3] + ~r[0]*r[1]*r[2]*r[3] + ~r[0]*~r[1]*~r[2];
+	
+	assign segr[4] = ~r[1]*~r[2]*r[3] + ~r[0]*r[1]*~r[2] + ~r[0]*r[2]*r[3];
+	
+	assign segr[3] = r[0]*~r[1]*r[2]*~r[3] + ~r[0]*r[1]*~r[2]*~r[3] + ~r[0]*~r[1]*~r[2]*r[3] + r[1]*r[2]*r[3];
+	
+	assign segr[2] = ~r[0]*~r[1]*r[2]*~r[3] + r[0]*r[1]*~r[2]*~r[3] + r[0]*r[1]*r[2];
+	
+//	always @ (posedge ci) begin
+//	//display 1 for cOut
+//		if (cOut==1) begin
+//			assign co[0]=cOut;
+//			assign co[1]=!cOut;
+//			assign co[2]=!cOut;
+//			assign co[3]=cOut;
+//			assign co[4]=cOut;
+//			assign co[5]=cOut;
+//			assign co[6]=cOut;
+//		end
+//	//display 0 for cOut
+//		else begin
+//			if (cOut==0) begin
+//				assign co[0]=cOut;
+//				assign co[1]=cOut;
+//				assign co[2]=cOut;
+//				assign co[3]=cOut;
+//				assign co[4]=cOut;
+//				assign co[5]=cOut;
+//				assign co[6]=!cOut;
+//			end
+//		end
+//	end
+	
+endmodule
