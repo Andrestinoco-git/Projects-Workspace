@@ -1,0 +1,234 @@
+
+module mastermind(input [3:0]inputAttempt,input enterAttempt,resetGame,output [6:0] f,f2,f3,f4,attemptsRemaining,output [3:0]numCorrect);
+	reg [3:0] attempts=4'd8;
+	reg [3:0] p1,p2,p3,p4;
+	reg [3:0] mc1,mc2,mc3,mc4;
+	reg [3:0] NUMCORRECT=4'd0;
+	integer player1=1;
+	integer player2=0;
+	integer position=0;
+	integer MCSET=0;
+	integer WINNER=0;
+	
+	always @(posedge enterAttempt) begin
+	position<=position+1;
+		if(!resetGame)begin
+			attempts<=4'd8;
+			mc1<=4'd0;
+			mc2<=4'd0;
+			mc3<=4'd0;
+			mc4<=4'd0;
+			p1<=4'd0;
+			p2<=4'd0;
+			p3<=4'd0;
+			p4<=4'd0;
+			player1<=1;
+			player2<=0;
+			position<=0;
+			MCSET<=0;
+			NUMCORRECT<=4'd0;
+		end
+	 else begin
+		if (player1==1&&WINNER==0) begin		//player 1 creates mastercode
+			if(position==1) begin
+				p1<=inputAttempt;
+				mc1<=inputAttempt;
+				//position<=position+1;
+			end
+			else if (position==2) begin
+				p2<=inputAttempt;
+				mc2<=inputAttempt;
+				//position<=3;
+			end
+			else if (position==3) begin
+				p3<=inputAttempt;
+				mc3<=inputAttempt;
+				//position<=4;
+			end
+			else if (position>=4) begin
+				p4<=inputAttempt;
+				mc4<=inputAttempt;
+				//////////v/////////////////////////////////////////
+				position<=0;
+				MCSET<=1;
+				//p4<=4'd0;
+			end////////////////////v//////////////////
+			if(MCSET==1&&position==0) begin
+				player1<=0;
+				player2<=1;
+				p1<=4'd0;
+				p2<=4'd0;
+				p3<=4'd0;
+				p4<=4'd0;
+			end
+		end
+		else if (player2==1&&MCSET==1&&WINNER==0) begin		//player 2 attempts to break code
+			if(position==1) begin
+				p1<=inputAttempt;
+				//position<=2;
+			end
+			else if (position==2) begin
+				p2<=inputAttempt;
+				//position<=3;
+			end
+			else if (position==3) begin
+				p3<=inputAttempt;
+				//position<=4;
+			end
+			else if (position>=4) begin
+				p4<=inputAttempt;
+				position<=0;
+			end
+		end
+		if(position==0&&WINNER==0) begin
+		//if one is incorrect code is attempt is restarted
+			if(p1!=mc1||p2!=mc2||p3!=mc3||p4!=mc4)begin
+				attempts<=attempts-4'd1;
+				p1<=4'd0;
+				p2<=4'd0;
+				p3<=4'd0;
+				p4<=4'd0;
+				if(p1==mc1||p1==mc2||p1==mc3||p1==mc4)	NUMCORRECT[0]<=1;
+				if(p2==mc1||p2==mc2||p2==mc3||p2==mc4)	NUMCORRECT[1]<=1;
+				if(p3==mc1||p3==mc2||p3==mc3||p3==mc4)	NUMCORRECT[2]<=1;
+				if(p4==mc1||p4==mc2||p4==mc3||p4==mc4) NUMCORRECT[3]<=1;
+				position<=1;
+			end
+		end	
+		//checks if win!
+		if(player2==1&&position==4&&WINNER==0) begin
+			if(p1==mc1||p1==mc2||p1==mc3||p1==mc4)	NUMCORRECT[0]<=1;
+			if(p2==mc1||p2==mc2||p2==mc3||p2==mc4)	NUMCORRECT[1]<=1;
+			if(p3==mc1||p3==mc2||p3==mc3||p3==mc4)	NUMCORRECT[2]<=1;
+			if(p4==mc1||p4==mc2||p4==mc3||p4==mc4) NUMCORRECT[3]<=1;
+		
+			if(p1==mc1&&p2==mc3&&p3==mc3&&p4==mc4)begin
+				NUMCORRECT[0]<=1;
+				NUMCORRECT[1]<=1;
+				NUMCORRECT[2]<=1;
+				NUMCORRECT[3]<=1;
+				player2<=0;
+				WINNER=1;
+				p1<=4'd0;
+				p2<=4'd0;
+				p3<=4'd0;
+				p4<=4'd0;
+			end
+		end
+		
+		//checks if ran out of attempts
+		if(attempts<=0) begin
+			player2<=0;
+			p1<=4'd0;
+			p2<=4'd0;
+			p3<=4'd0;
+			p4<=4'd0;
+			//position<=0;
+		end
+		
+	 end
+	end
+	assign numCorrect[0]=NUMCORRECT[0];
+	assign numCorrect[1]=NUMCORRECT[1];
+	assign numCorrect[2]=NUMCORRECT[2];
+	assign numCorrect[3]=NUMCORRECT[3];
+	sevenSeg(p1,p2,p3,p4,attempts,f,f2,f3,f4,attemptsRemaining);
+	
+endmodule
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+module sevenSeg(input [3:0] p1,p2,p3,p4,attempts, output [6:0] f,f2,f3,f4,aRemain);
+	
+	//p1
+	assign f[1] = p1[3]*p1[1]*p1[0] + p1[2]*p1[1]*~p1[0] + p1[2]*~p1[1]*(p1[3]^p1[0]);
+	
+	assign f[0] = p1[3]*p1[2]*~p1[1]*p1[0] + p1[3]*~p1[2]*p1[1]*p1[0] + ~p1[3]*p1[2]*~p1[1]*~p1[0] + ~p1[3]*~p1[2]*~p1[1]*p1[0];
+	
+	assign f[5] = p1[3]*p1[2]*~p1[1]*p1[0] + ~p1[3]*~p1[2]*p1[1] + ~p1[3]*~p1[2]*p1[0] + ~p1[3]*p1[1]*p1[0];
+	
+	assign f[6] = p1[3]*p1[2]*~p1[1]*~p1[0] + ~p1[3]*p1[2]*p1[1]*p1[0] + ~p1[3]*~p1[2]*~p1[1];
+	
+	assign f[4] = ~p1[2]*~p1[1]*p1[0] + ~p1[3]*p1[2]*~p1[1] + ~p1[3]*p1[1]*p1[0];
+	
+	assign f[3] = p1[3]*~p1[2]*p1[1]*~p1[0] + ~p1[3]*p1[2]*~p1[1]*~p1[0] + ~p1[3]*~p1[2]*~p1[1]*p1[0] + p1[2]*p1[1]*p1[0];
+	
+	assign f[2] = ~p1[3]*~p1[2]*p1[1]*~p1[0] + p1[3]*p1[2]*~p1[1]*~p1[0] + p1[3]*p1[2]*p1[1];
+	
+	//p2
+	assign f2[1] = p2[3]*p2[1]*p2[0] + p2[2]*p2[1]*~p2[0] + p2[2]*~p2[1]*(p2[3]^p2[0]);
+	
+	assign f2[0] = p2[3]*p2[2]*~p2[1]*p2[0] + p2[3]*~p2[2]*p2[1]*p2[0] + ~p2[3]*p2[2]*~p2[1]*~p2[0] + ~p2[3]*~p2[2]*~p2[1]*p2[0];
+	
+	assign f2[5] = p2[3]*p2[2]*~p2[1]*p2[0] + ~p2[3]*~p2[2]*p2[1] + ~p2[3]*~p2[2]*p2[0] + ~p2[3]*p2[1]*p2[0];
+	
+	assign f2[6] = p2[3]*p2[2]*~p2[1]*~p2[0] + ~p2[3]*p2[2]*p2[1]*p2[0] + ~p2[3]*~p2[2]*~p2[1];
+	
+	assign f2[4] = ~p2[2]*~p2[1]*p2[0] + ~p2[3]*p2[2]*~p2[1] + ~p2[3]*p2[1]*p2[0];
+	
+	assign f2[3] = p2[3]*~p2[2]*p2[1]*~p2[0] + ~p2[3]*p2[2]*~p2[1]*~p2[0] + ~p2[3]*~p2[2]*~p2[1]*p2[0] + p2[2]*p2[1]*p2[0];
+	
+	assign f2[2] = ~p2[3]*~p2[2]*p2[1]*~p2[0] + p2[3]*p2[2]*~p2[1]*~p2[0] + p2[3]*p2[2]*p2[1];
+	
+	//p3
+	assign f3[1] = p3[3]*p3[1]*p3[0] + p3[2]*p3[1]*~p3[0] + p3[2]*~p3[1]*(p3[3]^p3[0]);
+	
+	assign f3[0] = p3[3]*p3[2]*~p3[1]*p3[0] + p3[3]*~p3[2]*p3[1]*p3[0] + ~p3[3]*p3[2]*~p3[1]*~p3[0] + ~p3[3]*~p3[2]*~p3[1]*p3[0];
+	
+	assign f3[5] = p3[3]*p3[2]*~p3[1]*p3[0] + ~p3[3]*~p3[2]*p3[1] + ~p3[3]*~p3[2]*p3[0] + ~p3[3]*p3[1]*p3[0];
+	
+	assign f3[6] = p3[3]*p3[2]*~p3[1]*~p3[0] + ~p3[3]*p3[2]*p3[1]*p3[0] + ~p3[3]*~p3[2]*~p3[1];
+	
+	assign f3[4] = ~p3[2]*~p3[1]*p3[0] + ~p3[3]*p3[2]*~p3[1] + ~p3[3]*p3[1]*p3[0];
+	
+	assign f3[3] = p3[3]*~p3[2]*p3[1]*~p3[0] + ~p3[3]*p3[2]*~p3[1]*~p3[0] + ~p3[3]*~p3[2]*~p3[1]*p3[0] + p3[2]*p3[1]*p3[0];
+	
+	assign f3[2] = ~p3[3]*~p3[2]*p3[1]*~p3[0] + p3[3]*p3[2]*~p3[1]*~p3[0] + p3[3]*p3[2]*p3[1];
+	
+	//p4
+	assign f4[1] = p4[3]*p4[1]*p4[0] + p4[2]*p4[1]*~p4[0] + p4[2]*~p4[1]*(p4[3]^p4[0]);
+	
+	assign f4[0] = p4[3]*p4[2]*~p4[1]*p4[0] + p4[3]*~p4[2]*p4[1]*p4[0] + ~p4[3]*p4[2]*~p4[1]*~p4[0] + ~p4[3]*~p4[2]*~p4[1]*p4[0];
+	
+	assign f4[5] = p4[3]*p4[2]*~p4[1]*p4[0] + ~p4[3]*~p4[2]*p4[1] + ~p4[3]*~p4[2]*p4[0] + ~p4[3]*p4[1]*p4[0];
+	
+	assign f4[6] = p4[3]*p4[2]*~p4[1]*~p4[0] + ~p4[3]*p4[2]*p4[1]*p4[0] + ~p4[3]*~p4[2]*~p4[1];
+	
+	assign f4[4] = ~p4[2]*~p4[1]*p4[0] + ~p4[3]*p4[2]*~p4[1] + ~p4[3]*p4[1]*p4[0];
+	
+	assign f4[3] = p4[3]*~p4[2]*p4[1]*~p4[0] + ~p4[3]*p4[2]*~p4[1]*~p4[0] + ~p4[3]*~p4[2]*~p4[1]*p4[0] + p4[2]*p4[1]*p4[0];
+	
+	assign f4[2] = ~p4[3]*~p4[2]*p4[1]*~p4[0] + p4[3]*p4[2]*~p4[1]*~p4[0] + p4[3]*p4[2]*p4[1];
+	
+	//aRemain
+	assign aRemain[1] = attempts[3]*attempts[1]*attempts[0] + attempts[2]*attempts[1]*~attempts[0] + attempts[2]*~attempts[1]*(attempts[3]^attempts[0]);
+	
+	assign aRemain[0] = attempts[3]*attempts[2]*~attempts[1]*attempts[0] + attempts[3]*~attempts[2]*attempts[1]*attempts[0] + ~attempts[3]*attempts[2]*~attempts[1]*~attempts[0] + ~attempts[3]*~attempts[2]*~attempts[1]*attempts[0];
+	
+	assign aRemain[5] = attempts[3]*attempts[2]*~attempts[1]*attempts[0] + ~attempts[3]*~attempts[2]*attempts[1] + ~attempts[3]*~attempts[2]*attempts[0] + ~attempts[3]*attempts[1]*attempts[0];
+	
+	assign aRemain[6] = attempts[3]*attempts[2]*~attempts[1]*~attempts[0] + ~attempts[3]*attempts[2]*attempts[1]*attempts[0] + ~attempts[3]*~attempts[2]*~attempts[1];
+	
+	assign aRemain[4] = ~attempts[2]*~attempts[1]*attempts[0] + ~attempts[3]*attempts[2]*~attempts[1] + ~attempts[3]*attempts[1]*attempts[0];
+	
+	assign aRemain[3] = attempts[3]*~attempts[2]*attempts[1]*~attempts[0] + ~attempts[3]*attempts[2]*~attempts[1]*~attempts[0] + ~attempts[3]*~attempts[2]*~attempts[1]*attempts[0] + attempts[2]*attempts[1]*attempts[0];
+	
+	assign aRemain[2] = ~attempts[3]*~attempts[2]*attempts[1]*~attempts[0] + attempts[3]*attempts[2]*~attempts[1]*~attempts[0] + attempts[3]*attempts[2]*attempts[1];
+	
+endmodule
