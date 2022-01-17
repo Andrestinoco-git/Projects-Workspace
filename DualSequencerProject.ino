@@ -1,5 +1,5 @@
 //ANDRES TINOCO 216323560 ARDUINO PIANO DUAL SEQUENCER FOR EECS2032
-//APRIL 29, 2021
+//APRIL 29, 2021    C++
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // IF THE PROGRAM DOES NOT RUN MAKE SURE TO ADD THE ZIP FOLDER NAMED LiquidCrystal_I2C-master INTO THIS SKETCH //
