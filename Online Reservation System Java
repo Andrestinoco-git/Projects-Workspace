@@ -1,5 +1,5 @@
 /*Andres Tinoco               *Thursday March 28,2018
-ONLINE RESERVATION SYSTEM
+ONLINE RESERVATION SYSTEM  JAVA
 
  * This is a program that asks the user to reserve seats on an airplane. The seats in first class are 1-5 and economy is from 6-10.
  * The user is asked to choose between first class and economy seating and assigns seating starting from 1-5 in first class, and 6-10
